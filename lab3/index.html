@@ -105,7 +105,32 @@
                     <h3 style="font-weight:600;">Бюджет</h3>
                 </div>
                 <div class="tab-pane fade" id="income-tab-content" role="tabpanel" aria-labelledby="income-tab">
-                    <h3 style="color:rgb(13,110,253);font-weight:600;">Настройки</h3>
+                    <div class="top-tab-content d-flex justify-content-between align-items-start">
+                        <h3 style="color:rgb(13,110,253);font-weight:600;">Доходы</h3>
+                        <div class="dropdown-filter md-5 text-center" id="dropdown-filter-income">
+                            <a class="btn btn-secondary transparent-btn dropdown-toggle" href="#" id="dropdownMenuLinkIncome" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="https://img.icons8.com/?size=100&id=16152&format=png&color=737373" alt="Logo" width="25" height="24" class="d-inline-block align-text-top">
+                                <span id="selected-item-income">За все время</span>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLinkIncome" onclick="this.classList.remove('show');">
+                                <li><a class="dropdown-item active" href="#dropdown-week-content" onclick="selectItemIncome(this, 'За неделю')">За неделю</a></li>
+                                <li><a class="dropdown-item" href="#dropdown-month-content" onclick="selectItemIncome(this, 'За месяц')">За месяц</a></li>
+                                <li><a class="dropdown-item" href="#dropdown-year-content" onclick="selectItemIncome(this, 'За год')">За год</a></li>
+                                <li><a class="dropdown-item" href="#dropdown-all-time-content" onclick="selectItemIncome(this, 'За все время')">За все время</a></li>
+                            </ul>
+                        </div>
+                        
+                        <button class="btn btn-primary rounded-pill" type="button" id="add-income" onclick="addIncome()">+</button>
+                    </div>
+                    <div class="main-tab-content">
+                        <ol class="list-group" id="income-list">
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">Итого</div>
+                                <span class="expended badge" id="income-total" style="margin-right: -10px;">0</span>
+                                <span class="expended badge" id="income-total-currency">₽</span>
+                            </li>
+                        </ol>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="expenses-tab-content" role="tabpanel" aria-labelledby="expenses-tab">
                     <div class="top-tab-content d-flex justify-content-between align-items-start">
@@ -113,17 +138,13 @@
                         <div class="dropdown-filter md-5 text-center" id="dropdown-filter">
                             <a class="btn btn-secondary transparent-btn dropdown-toggle" href="#" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                                 <img src="https://img.icons8.com/?size=100&id=16152&format=png&color=737373" alt="Logo" width="25" height="24" class="d-inline-block align-text-top">
-                                <span id="selected-item">Текущая неделя</span>
+                                <span id="selected-item">За все время</span>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink" onclick="this.classList.remove('show');">
-                                <li><a class="dropdown-item active" href="#dropdown-week-content" onclick="selectItem(this, 'Текущая неделя')">Текущая неделя</a></li>
-                                <li><a class="dropdown-item" href="#dropdown-month-content" onclick="selectItem(this, 'За этот месяц')">За этот месяц</a></li>
-                                <li><a class="dropdown-item" href="#dropdown-year-content" onclick="selectItem(this, 'За этот год')">За этот год</a></li>
-                                <li><a class="dropdown-item" href="#dropdown-all-time-content" onclick="selectItem(this, 'За всё время')">За всё время</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <input type="text" class="form-control" id="input-type-expenses" style="width: 150px; margin-left: 3px;" placeholder="Тип расхода">
-                                </li>
+                                <li><a class="dropdown-item active" href="#dropdown-week-content" onclick="selectItem(this, 'За неделю')">За неделю</a></li>
+                                <li><a class="dropdown-item" href="#dropdown-month-content" onclick="selectItem(this, 'За месяц')">За месяц</a></li>
+                                <li><a class="dropdown-item" href="#dropdown-year-content" onclick="selectItem(this, 'За год')">За год</a></li>
+                                <li><a class="dropdown-item" href="#dropdown-all-time-content" onclick="selectItem(this, 'За все время')">За все время</a></li>
                             </ul>
                         </div>
                         
@@ -132,40 +153,63 @@
                     <div class="main-tab-content">
                         <ol class="list-group" id="expenses-list">
                             <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <div class="ms-2 me-auto" id="expense1">
-                                    <div class="fw-bold" style="display: flex; align-items: center;">
-                                        <span style="margin-right: 10px;" id="expense-date1">Дата расхода</span>
-                                        <button class="btn" onclick="updateExpense(1)" id="editButton1">
-                                            <img src="https://img.icons8.com/?size=100&id=ky9dlsSpTXp0&format=png&color=000000" alt="Edit" width="25" height="24" class="d-inline-block align-text-right">
-                                        </button>
-                                        <button class="btn" onclick="deleteExpense(1)" id="deleteButton1" style="margin-left: 10px;">
-                                            <img src="https://img.icons8.com/?size=100&id=85081&format=png&color=000000" alt="Delete" width="25" height="24" class="d-inline-block align-text-right">
-                                        </button>
-                                    </div>
-                                    <div id="expense-type1" style="color: #595f5c;">Тип расхода</div>
-                                </div>
-                                <div class="currency">
-                                    <span class="expended" id="expense-amount1">0</span>
-                                    <div id="expense-currency1" style="display: inline;">₽</div>
-                                </div>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-start">
                                 <div class="ms-2 me-auto">Итого</div>
                                 <span class="expended badge" id="expense-total" style="margin-right: -10px;">0</span>
                                 <span class="expended badge" id="expense-total-currency">₽</span>
                             </li>
                         </ol>
                     </div>
-                    
                 </div>
                 <div class="tab-pane fade" id="settings-tab-content" role="tabpanel" aria-labelledby="settings-tab">
-                    <h3 style="color:rgb(13,110,253);font-weight:600;">Настройки</h3>
+                    <div class="container mt-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">Управление валютами</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="currency-form">
+                                            <div class="mb-3">
+                                                <label for="currency-code" class="form-label">Код валюты</label>
+                                                <input type="text" class="form-control" id="currency-code" placeholder="Например: USD, EUR">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="currency-rate" class="form-label">Курс к рублю</label>
+                                                <input type="number" step="0.01" class="form-control" id="currency-rate" placeholder="Например: 90.5">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="currency-date" class="form-label">Дата курса</label>
+                                                <input type="date" class="form-control" id="currency-date">
+                                            </div>
+                                            <button type="button" class="btn btn-primary" onclick="addCurrency()">Добавить валюту</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title mb-0">Список валют</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-group" id="currency-list">
+                                            <!-- Здесь будут отображаться добавленные валюты -->
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.1/dist/chartjs-adapter-moment.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
