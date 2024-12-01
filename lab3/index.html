@@ -107,20 +107,26 @@
                 <div class="tab-pane fade" id="income-tab-content" role="tabpanel" aria-labelledby="income-tab">
                     <div class="top-tab-content d-flex justify-content-between align-items-start">
                         <h3 style="color:rgb(13,110,253);font-weight:600;">Доходы</h3>
-                        <div class="dropdown-filter md-5 text-center" id="dropdown-filter-income">
-                            <a class="btn btn-secondary transparent-btn dropdown-toggle" href="#" id="dropdownMenuLinkIncome" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="https://img.icons8.com/?size=100&id=16152&format=png&color=737373" alt="Logo" width="25" height="24" class="d-inline-block align-text-top">
-                                <span id="selected-item-income">За все время</span>
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLinkIncome" onclick="this.classList.remove('show');">
-                                <li><a class="dropdown-item active" href="#dropdown-week-content" onclick="selectItemIncome(this, 'За неделю')">За неделю</a></li>
-                                <li><a class="dropdown-item" href="#dropdown-month-content" onclick="selectItemIncome(this, 'За месяц')">За месяц</a></li>
-                                <li><a class="dropdown-item" href="#dropdown-year-content" onclick="selectItemIncome(this, 'За год')">За год</a></li>
-                                <li><a class="dropdown-item" href="#dropdown-all-time-content" onclick="selectItemIncome(this, 'За все время')">За все время</a></li>
-                            </ul>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="dropdown" id="dropdown-filter-income">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: rgba(108, 117, 125, 0.7); border: none;">
+                                    <span>Фильтры</span>
+                                </button>
+                                <div class="dropdown-menu p-3" style="width: 300px;">
+                                    <div class="mb-3">
+                                        <label class="form-label">Диапазон дат:</label>
+                                        <input type="date" class="form-control mb-2" id="income-start-date">
+                                        <input type="date" class="form-control" id="income-end-date">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Тип:</label>
+                                        <input type="text" class="form-control" id="income-type-filter" placeholder="Введите тип дохода">
+                                    </div>
+                                    <button class="btn btn-primary w-100" onclick="applyIncomeFilters()">Применить фильтры</button>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary rounded-pill" type="button" id="add-income" onclick="addIncome()">+</button>
                         </div>
-                        
-                        <button class="btn btn-primary rounded-pill" type="button" id="add-income" onclick="addIncome()">+</button>
                     </div>
                     <div class="main-tab-content">
                         <ol class="list-group" id="income-list">
@@ -135,20 +141,26 @@
                 <div class="tab-pane fade" id="expenses-tab-content" role="tabpanel" aria-labelledby="expenses-tab">
                     <div class="top-tab-content d-flex justify-content-between align-items-start">
                         <h3 style="color:rgb(13,110,253);font-weight:600;">Расходы</h3>
-                        <div class="dropdown-filter md-5 text-center" id="dropdown-filter">
-                            <a class="btn btn-secondary transparent-btn dropdown-toggle" href="#" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="https://img.icons8.com/?size=100&id=16152&format=png&color=737373" alt="Logo" width="25" height="24" class="d-inline-block align-text-top">
-                                <span id="selected-item">За все время</span>
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink" onclick="this.classList.remove('show');">
-                                <li><a class="dropdown-item active" href="#dropdown-week-content" onclick="selectItem(this, 'За неделю')">За неделю</a></li>
-                                <li><a class="dropdown-item" href="#dropdown-month-content" onclick="selectItem(this, 'За месяц')">За месяц</a></li>
-                                <li><a class="dropdown-item" href="#dropdown-year-content" onclick="selectItem(this, 'За год')">За год</a></li>
-                                <li><a class="dropdown-item" href="#dropdown-all-time-content" onclick="selectItem(this, 'За все время')">За все время</a></li>
-                            </ul>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="dropdown" id="dropdown-filter">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: rgba(108, 117, 125, 0.7); border: none;">
+                                    <span>Фильтры</span>
+                                </button>
+                                <div class="dropdown-menu p-3" style="width: 300px;">
+                                    <div class="mb-3">
+                                        <label class="form-label">Диапазон дат:</label>
+                                        <input type="date" class="form-control mb-2" id="expense-start-date">
+                                        <input type="date" class="form-control" id="expense-end-date">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Тип:</label>
+                                        <input type="text" class="form-control" id="expense-type-filter" placeholder="Введите тип расхода">
+                                    </div>
+                                    <button class="btn btn-primary w-100" onclick="applyExpenseFilters()">Применить фильтры</button>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary rounded-pill" type="button" id="add-expenses" onclick="addExpenses()">+</button>
                         </div>
-                        
-                        <button class="btn btn-primary rounded-pill" type="button" id="add-expenses" onclick="addExpenses()">+</button>
                     </div>
                     <div class="main-tab-content">
                         <ol class="list-group" id="expenses-list">

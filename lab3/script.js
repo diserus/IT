@@ -351,61 +351,109 @@ function calculateTotalIncome() {
     document.getElementById("income-total").textContent = totalValue.toFixed(2);
 }
 
-function selectItem(item, text) {
-    document.getElementById('selected-item').textContent = text;
-    const dropdownItems = document.querySelectorAll('#dropdown-filter .dropdown-item');
-    dropdownItems.forEach(item => item.classList.remove('active')); 
-    item.classList.add('active'); 
-    filterTransactions('expense');
-}
-
-function selectItemIncome(item, text) {
-    document.getElementById('selected-item-income').textContent = text;
-    const dropdownItems = document.querySelectorAll('#dropdown-filter-income .dropdown-item');
-    dropdownItems.forEach(item => item.classList.remove('active'));
-    item.classList.add('active');
-    filterTransactions('income');
-}
-
-function filterTransactions(type) {
-    const period = type === 'expense' ? 
-        document.getElementById('selected-item').textContent : 
-        document.getElementById('selected-item-income').textContent;
+function applyExpenseFilters() {
+    const startDate = document.getElementById('expense-start-date').value;
+    const endDate = document.getElementById('expense-end-date').value;
+    const typeFilter = document.getElementById('expense-type-filter').value.toLowerCase().trim();
     
-    const transactions = type === 'expense' ? budget.expenses : budget.incomes;
-    const currentDate = new Date();
-    let startDate = new Date();
-    
-    switch(period) {
-        case 'За неделю':
-            startDate.setDate(currentDate.getDate() - 7);
-            break;
-        case 'За месяц':
-            startDate.setMonth(currentDate.getMonth() - 1);
-            break;
-        case 'За год':
-            startDate.setFullYear(currentDate.getFullYear() - 1);
-            break;
-        case 'За все время':
-            startDate = new Date(0); // начало эпохи
-            break;
-        default:
-            startDate = new Date(0);
-    }
+    let filteredExpenses = budget.expenses.filter(expense => {
+        let matchesDate = true;
+        let matchesType = true;
 
-    // Фильтруем транзакции
-    const filteredTransactions = transactions.filter(t => {
-        const transactionDate = new Date(t.date);
-        return transactionDate >= startDate && transactionDate <= currentDate;
+        // Проверка по дате
+        if (startDate && endDate) {
+            const expenseDate = new Date(expense.date);
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            // Устанавливаем время в 00:00:00 для корректного сравнения
+            expenseDate.setHours(0, 0, 0, 0);
+            start.setHours(0, 0, 0, 0);
+            end.setHours(0, 0, 0, 0);
+            matchesDate = expenseDate >= start && expenseDate <= end;
+        } else if (startDate) {
+            const expenseDate = new Date(expense.date);
+            const start = new Date(startDate);
+            expenseDate.setHours(0, 0, 0, 0);
+            start.setHours(0, 0, 0, 0);
+            matchesDate = expenseDate >= start;
+        } else if (endDate) {
+            const expenseDate = new Date(expense.date);
+            const end = new Date(endDate);
+            expenseDate.setHours(0, 0, 0, 0);
+            end.setHours(0, 0, 0, 0);
+            matchesDate = expenseDate <= end;
+        }
+
+        // Проверка по типу
+        if (typeFilter) {
+            matchesType = expense.type.toLowerCase().includes(typeFilter);
+        }
+
+        // Возвращаем true только если транзакция соответствует обоим фильтрам
+        return matchesDate && matchesType;
     });
-
+    
     // Обновляем отображение
-    if (type === 'expense') {
-        updateExpensesList(filteredTransactions);
-    } else {
-        updateIncomesList(filteredTransactions);
-    }
+    updateExpensesList(filteredExpenses);
 }
+
+function applyIncomeFilters() {
+    const startDate = document.getElementById('income-start-date').value;
+    const endDate = document.getElementById('income-end-date').value;
+    const typeFilter = document.getElementById('income-type-filter').value.toLowerCase().trim();
+    
+    let filteredIncomes = budget.incomes.filter(income => {
+        let matchesDate = true;
+        let matchesType = true;
+
+        // Проверка по дате
+        if (startDate && endDate) {
+            const incomeDate = new Date(income.date);
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            // Устанавливаем время в 00:00:00 для корректного сравнения
+            incomeDate.setHours(0, 0, 0, 0);
+            start.setHours(0, 0, 0, 0);
+            end.setHours(0, 0, 0, 0);
+            matchesDate = incomeDate >= start && incomeDate <= end;
+        } else if (startDate) {
+            const incomeDate = new Date(income.date);
+            const start = new Date(startDate);
+            incomeDate.setHours(0, 0, 0, 0);
+            start.setHours(0, 0, 0, 0);
+            matchesDate = incomeDate >= start;
+        } else if (endDate) {
+            const incomeDate = new Date(income.date);
+            const end = new Date(endDate);
+            incomeDate.setHours(0, 0, 0, 0);
+            end.setHours(0, 0, 0, 0);
+            matchesDate = incomeDate <= end;
+        }
+
+        // Проверка по типу
+        if (typeFilter) {
+            matchesType = income.type.toLowerCase().includes(typeFilter);
+        }
+
+        // Возвращаем true только если транзакция соответствует обоим фильтрам
+        return matchesDate && matchesType;
+    });
+    
+    // Обновляем отображение
+    updateIncomesList(filteredIncomes);
+}
+
+// Добавляем обработчики для предотвращения закрытия выпадающего меню при клике на фильтры
+document.addEventListener('DOMContentLoaded', function() {
+    const dropdowns = document.querySelectorAll('.dropdown-menu');
+    dropdowns.forEach(dropdown => {
+        dropdown.addEventListener('click', function(e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'LABEL' || e.target.tagName === 'BUTTON') {
+                e.stopPropagation();
+            }
+        });
+    });
+});
 
 function updateExpensesList(filteredExpenses) {
     const expensesList = document.getElementById('expenses-list');
