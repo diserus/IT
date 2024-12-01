@@ -561,7 +561,7 @@ function updateBalanceChart() {
                         x: new Date(),
                         y: 0
                     }],
-                    borderColor: 'rgb(75, 192, 192)',
+                    borderColor: 'rgb(13, 110, 253)',
                     tension: 0.1
                 }]
             },
@@ -647,7 +647,7 @@ function updateBalanceChart() {
             datasets: [{
                 label: 'Баланс (₽)',
                 data: balanceData,
-                borderColor: 'rgb(75, 192, 192)',
+                borderColor: 'rgb(13, 110, 253)',
                 tension: 0.1
             }]
         },
