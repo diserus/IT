@@ -697,6 +697,18 @@ budget.deleteExpense = function(index) {
     updateBalanceChart();
 };
 
+function createFilterButton() {
+    const filterButton = document.createElement('button');
+    filterButton.className = 'btn dropdown-toggle';
+    filterButton.style.backgroundColor = 'white';
+    filterButton.style.border = '1px solid #6c757d';
+    filterButton.setAttribute('type', 'button');
+    filterButton.setAttribute('data-bs-toggle', 'dropdown');
+    filterButton.setAttribute('aria-expanded', 'false');
+    filterButton.innerHTML = '<i class="bi bi-funnel"></i> Фильтры';
+    return filterButton;
+}
+
 function addCurrency() {
     const code = document.getElementById('currency-code').value.toUpperCase();
     const rate = parseFloat(document.getElementById('currency-rate').value);
@@ -780,3 +792,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     updateCurrencyList();
 });
+
+function applyFilters() {
+    const filterButton = createFilterButton();
+    // ... rest of your code
+}
