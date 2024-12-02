@@ -143,6 +143,30 @@ let purchaseCount = 1;
 let incomeCount = 1;
 let isEditing = false;
 
+budget.addIncome = function(income) {
+    this.incomes.push(income);
+    updateBalanceChart();
+};
+
+budget.deleteIncome = function(index) {
+    if (index >= 0 && index < this.incomes.length) {
+        this.incomes.splice(index, 1);
+        updateBalanceChart();
+    }
+};
+
+budget.addExpense = function(expense) {
+    this.expenses.push(expense);
+    updateBalanceChart();
+};
+
+budget.deleteExpense = function(index) {
+    if (index >= 0 && index < this.expenses.length) {
+        this.expenses.splice(index, 1);
+        updateBalanceChart();
+    }
+};
+
 function addExpenses() {
     purchaseCount++;
     const expensesList = document.getElementById('expenses-list');
@@ -179,8 +203,6 @@ function updateExpense(expenseId) {
     if (!isEditing) {
         dateElement.innerHTML = `<input type="date" value="${dateElement.innerText}" />`;
         amountElement.innerHTML = `<input type="number" value="${amountElement.innerText}" />`;
-        
-        // Создаем выпадающий список валют
         let currencySelect = '<select>';
         budget.currencies.forEach(currency => {
             currencySelect += `<option value="${currency.name}">${currency.name}</option>`;
@@ -214,8 +236,6 @@ function updateExpense(expenseId) {
 function deleteExpense(expenseId) {
     const expenseElement = document.getElementById(`expense${expenseId}`);
     if (!expenseElement) return;
-
-    // Находим индекс расхода в массиве
     const index = Array.from(expenseElement.parentElement.parentElement.children)
         .filter(el => el.querySelector('[id^="expense"]'))
         .indexOf(expenseElement.parentElement);
@@ -235,11 +255,9 @@ function calculateTotalExpense() {
     }
 
     const totalValue = budget.expenses.reduce((accumulator, expense) => {
-        // Находим валюту для текущего расхода
         const currency = budget.currencies.find(c => c.name === expense.currency.name);
         if (!currency) return accumulator;
-        
-        // Конвертируем в рубли
+
         const valueInRubles = Number(expense.value) * currency.rate;
         return accumulator + valueInRubles;
     }, 0);
@@ -283,8 +301,6 @@ function updateIncome(incomeId) {
     if (!isEditing) {
         dateElement.innerHTML = `<input type="date" value="${dateElement.innerText}" />`;
         amountElement.innerHTML = `<input type="number" value="${amountElement.innerText}" />`;
-        
-        // Создаем выпадающий список валют
         let currencySelect = '<select>';
         budget.currencies.forEach(currency => {
             currencySelect += `<option value="${currency.name}">${currency.name}</option>`;
@@ -318,8 +334,6 @@ function updateIncome(incomeId) {
 function deleteIncome(incomeId) {
     const incomeElement = document.getElementById(`income${incomeId}`);
     if (!incomeElement) return;
-
-    // Находим индекс дохода в массиве
     const index = Array.from(incomeElement.parentElement.parentElement.children)
         .filter(el => el.querySelector('[id^="income"]'))
         .indexOf(incomeElement.parentElement);
@@ -339,11 +353,8 @@ function calculateTotalIncome() {
     }
 
     const totalValue = budget.incomes.reduce((accumulator, income) => {
-        // Находим валюту для текущего дохода
         const currency = budget.currencies.find(c => c.name === income.currency.name);
         if (!currency) return accumulator;
-        
-        // Конвертируем в рубли
         const valueInRubles = Number(income.value) * currency.rate;
         return accumulator + valueInRubles;
     }, 0);
@@ -359,13 +370,10 @@ function applyExpenseFilters() {
     let filteredExpenses = budget.expenses.filter(expense => {
         let matchesDate = true;
         let matchesType = true;
-
-        // Проверка по дате
         if (startDate && endDate) {
             const expenseDate = new Date(expense.date);
             const start = new Date(startDate);
             const end = new Date(endDate);
-            // Устанавливаем время в 00:00:00 для корректного сравнения
             expenseDate.setHours(0, 0, 0, 0);
             start.setHours(0, 0, 0, 0);
             end.setHours(0, 0, 0, 0);
@@ -383,17 +391,11 @@ function applyExpenseFilters() {
             end.setHours(0, 0, 0, 0);
             matchesDate = expenseDate <= end;
         }
-
-        // Проверка по типу
         if (typeFilter) {
             matchesType = expense.type.toLowerCase().includes(typeFilter);
         }
-
-        // Возвращаем true только если транзакция соответствует обоим фильтрам
         return matchesDate && matchesType;
     });
-    
-    // Обновляем отображение
     updateExpensesList(filteredExpenses);
 }
 
@@ -406,12 +408,10 @@ function applyIncomeFilters() {
         let matchesDate = true;
         let matchesType = true;
 
-        // Проверка по дате
         if (startDate && endDate) {
             const incomeDate = new Date(income.date);
             const start = new Date(startDate);
             const end = new Date(endDate);
-            // Устанавливаем время в 00:00:00 для корректного сравнения
             incomeDate.setHours(0, 0, 0, 0);
             start.setHours(0, 0, 0, 0);
             end.setHours(0, 0, 0, 0);
@@ -430,21 +430,116 @@ function applyIncomeFilters() {
             matchesDate = incomeDate <= end;
         }
 
-        // Проверка по типу
         if (typeFilter) {
             matchesType = income.type.toLowerCase().includes(typeFilter);
         }
-
-        // Возвращаем true только если транзакция соответствует обоим фильтрам
         return matchesDate && matchesType;
     });
-    
-    // Обновляем отображение
     updateIncomesList(filteredIncomes);
 }
 
-// Добавляем обработчики для предотвращения закрытия выпадающего меню при клике на фильтры
+function applyBalanceFilters() {
+    const startDate = document.getElementById('balance-start-date').value;
+    const endDate = document.getElementById('balance-end-date').value;
+    const showIncome = document.getElementById('show-income').checked;
+    const showExpenses = document.getElementById('show-expenses').checked;
+
+    updateBalanceChart(startDate, endDate, showIncome, showExpenses);
+}
+
+function updateBalanceChart(startDate = '', endDate = '', showIncome = true, showExpenses = true) {
+    const ctx = document.getElementById('balance-chart').getContext('2d');
+    let dates = [...budget.incomes.map(i => i.date), ...budget.expenses.map(e => e.date)];
+    dates = [...new Set(dates)].sort();
+
+    if (startDate && endDate) {
+        dates = dates.filter(date => date >= startDate && date <= endDate);
+    }
+
+    let balanceData = [];
+    let runningBalance = 0;
+
+    dates.forEach(date => {
+        let dailyIncome = 0;
+        let dailyExpense = 0;
+
+        if (showIncome) {
+            dailyIncome = budget.incomes
+                .filter(income => income.date === date)
+                .reduce((sum, income) => sum + (parseFloat(income.value) * income.currency.rate), 0);
+        }
+
+        if (showExpenses) {
+            dailyExpense = budget.expenses
+                .filter(expense => expense.date === date)
+                .reduce((sum, expense) => sum + (parseFloat(expense.value) * expense.currency.rate), 0);
+        }
+
+        runningBalance += dailyIncome - dailyExpense;
+        balanceData.push({ x: date, y: runningBalance });
+    });
+
+    if (window.balanceChart instanceof Chart) {
+        window.balanceChart.destroy();
+    }
+
+    window.balanceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: 'Баланс',
+                data: balanceData,
+                borderColor: 'rgb(13, 110, 253)',  
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                tension: 0.1,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Дата'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Баланс (₽)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false  
+                },
+                title: {
+                    display: true,
+                    text: 'График баланса'
+                }
+            }
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    if (budget.currencies.length === 0) {
+        budget.addCurrency(new Currency('RUB', 1, new Date().toISOString().split('T')[0]));
+    }
+    updateCurrencyDropdowns();
+    
+    const balanceTab = document.getElementById('balance-tab-content');
+    const canvas = document.createElement('canvas');
+    canvas.id = 'balance-chart';
+    balanceTab.appendChild(canvas);
+    updateBalanceChart();
+    
     const dropdowns = document.querySelectorAll('.dropdown-menu');
     dropdowns.forEach(dropdown => {
         dropdown.addEventListener('click', function(e) {
@@ -457,11 +552,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function updateExpensesList(filteredExpenses) {
     const expensesList = document.getElementById('expenses-list');
-    // Сохраняем последний элемент (кнопку добавления)
     const addButton = expensesList.lastElementChild;
-    // Очищаем список
     expensesList.innerHTML = '';
-    // Добавляем отфильтрованные расходы
     filteredExpenses.forEach((expense, index) => {
         const li = document.createElement('li');
         li.className = 'list-group-item d-flex justify-content-between align-items-start';
@@ -485,19 +577,15 @@ function updateExpensesList(filteredExpenses) {
         `;
         expensesList.appendChild(li);
     });
-    // Возвращаем кнопку добавления
     expensesList.appendChild(addButton);
-    // Обновляем общую сумму для отфильтрованных расходов
     updateFilteredTotal(filteredExpenses, 'expense');
 }
 
 function updateIncomesList(filteredIncomes) {
     const incomesList = document.getElementById('income-list');
-    // Сохраняем последний элемент (кнопку добавления)
+
     const addButton = incomesList.lastElementChild;
-    // Очищаем список
     incomesList.innerHTML = '';
-    // Добавляем отфильтрованные доходы
     filteredIncomes.forEach((income, index) => {
         const li = document.createElement('li');
         li.className = 'list-group-item d-flex justify-content-between align-items-start';
@@ -521,9 +609,7 @@ function updateIncomesList(filteredIncomes) {
         `;
         incomesList.appendChild(li);
     });
-    // Возвращаем кнопку добавления
     incomesList.appendChild(addButton);
-    // Обновляем общую сумму для отфильтрованных доходов
     updateFilteredTotal(filteredIncomes, 'income');
 }
 
@@ -536,177 +622,6 @@ function updateFilteredTotal(filteredTransactions, type) {
 
     const totalElement = document.getElementById(type === 'expense' ? 'expense-total' : 'income-total');
     totalElement.textContent = totalValue.toFixed(2);
-}
-
-const balanceTab = document.getElementById('balance-tab-content');
-const canvas = document.createElement('canvas');
-canvas.id = 'balance-chart';
-balanceTab.appendChild(canvas);
-
-function updateBalanceChart() {
-    const ctx = document.getElementById('balance-chart').getContext('2d');
-    
-    // Если нет транзакций, показываем пустой график с нулевым балансом
-    if (budget.expenses.length === 0 && budget.incomes.length === 0) {
-        if (window.balanceChart) {
-            window.balanceChart.destroy();
-        }
-        
-        window.balanceChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                datasets: [{
-                    label: 'Баланс (₽)',
-                    data: [{
-                        x: new Date(),
-                        y: 0
-                    }],
-                    borderColor: 'rgb(13, 110, 253)',
-                    tension: 0.1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `Баланс: ${context.parsed.y.toFixed(2)} ₽`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'day'
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value, index, values) {
-                                return value.toFixed(2) + ' ₽';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        return;
-    }
-
-    // Получаем все транзакции с конвертацией в рубли
-    const transactions = [
-        ...budget.expenses.map(e => {
-            const currency = budget.currencies.find(c => c.name === e.currency.name);
-            const valueInRubles = currency ? -Number(e.value) * currency.rate : -Number(e.value);
-            return {
-                date: new Date(e.date),
-                value: valueInRubles,
-                type: 'expense'
-            };
-        }),
-        ...budget.incomes.map(i => {
-            const currency = budget.currencies.find(c => c.name === i.currency.name);
-            const valueInRubles = currency ? Number(i.value) * currency.rate : Number(i.value);
-            return {
-                date: new Date(i.date),
-                value: valueInRubles,
-                type: 'income'
-            };
-        })
-    ];
-    
-    // Сортируем по дате
-    transactions.sort((a, b) => a.date - b.date);
-    
-    // Вычисляем накопительный баланс
-    let balance = 0;
-    const balanceData = transactions.map(t => {
-        balance += t.value;
-        return {
-            x: t.date,
-            y: balance
-        };
-    });
-    
-    // Если график уже существует, уничтожаем его
-    if (window.balanceChart) {
-        window.balanceChart.destroy();
-    }
-    
-    // Создаем новый график
-    window.balanceChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            datasets: [{
-                label: 'Баланс (₽)',
-                data: balanceData,
-                borderColor: 'rgb(13, 110, 253)',
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: false // Убираем легенду
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `Баланс: ${context.parsed.y.toFixed(2)} ₽`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'day'
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value, index, values) {
-                            return value.toFixed(2) + ' ₽';
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
-const originalAddExpense = budget.addExpense;
-budget.addExpense = function(expense) {
-    originalAddExpense.call(this, expense);
-    updateBalanceChart();
-};
-
-const originalDeleteExpense = budget.deleteExpense;
-budget.deleteExpense = function(index) {
-    originalDeleteExpense.call(this, index);
-    updateBalanceChart();
-};
-
-function createFilterButton() {
-    const filterButton = document.createElement('button');
-    filterButton.className = 'btn dropdown-toggle';
-    filterButton.style.backgroundColor = 'white';
-    filterButton.style.border = '1px solid #6c757d';
-    filterButton.setAttribute('type', 'button');
-    filterButton.setAttribute('data-bs-toggle', 'dropdown');
-    filterButton.setAttribute('aria-expanded', 'false');
-    filterButton.innerHTML = '<i class="bi bi-funnel"></i> Фильтры';
-    return filterButton;
 }
 
 function addCurrency() {
@@ -732,9 +647,8 @@ function addCurrency() {
 
 function updateCurrencyList() {
     const currencyList = document.getElementById('currency-list');
-    currencyList.innerHTML = ''; // Очищаем список
+    currencyList.innerHTML = ''; 
 
-    // Добавляем рубль как валюту по умолчанию, если его нет
     if (!budget.currencies.some(c => c.name === 'RUB')) {
         budget.addCurrency(new Currency('RUB', 1, new Date().toISOString().split('T')[0]));
     }
@@ -763,7 +677,6 @@ function deleteCurrency(index) {
 }
 
 function updateCurrencyDropdowns() {
-    // Обновляем выпадающие списки валют в формах расходов и доходов
     const expenseCurrencySelect = document.querySelector('#expense-currency1 select');
     const incomeCurrencySelect = document.querySelector('#income-currency1 select');
     
@@ -783,17 +696,4 @@ function updateDropdown(select) {
         option.textContent = currency.name;
         select.appendChild(option);
     });
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Добавляем рубль как валюту по умолчанию
-    if (budget.currencies.length === 0) {
-        budget.addCurrency(new Currency('RUB', 1, new Date().toISOString().split('T')[0]));
-    }
-    updateCurrencyList();
-});
-
-function applyFilters() {
-    const filterButton = createFilterButton();
-    // ... rest of your code
 }
