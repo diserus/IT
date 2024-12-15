@@ -5,19 +5,16 @@ class Currency {
         this.date = date;
     }
 }
-
 class ExpenseType {
     constructor(name) {
         this.name = name;
     }
 }
-
 class IncomeType {
     constructor(name) {
         this.name = name;
     }
 }
-
 class Expense {
     constructor(value, type, date, currency) {
         this.value = value;
@@ -26,7 +23,6 @@ class Expense {
         this.currency = currency;
     }
 }
-
 class Income {
     constructor(value, type, date, currency) {
         this.value = value;
@@ -35,7 +31,6 @@ class Income {
         this.currency = currency; 
     }
 }
-
 class Budget {
     constructor() {
         this.currencies = [];
@@ -44,71 +39,55 @@ class Budget {
         this.expenses = [];
         this.incomes = [];
     }
-
     addCurrency(currency) {
         this.currencies.push(currency);
     }
-
     updateCurrency(index, currency) {
         this.currencies[index] = currency;
     }
-
     deleteCurrency(index) {
         this.currencies.splice(index, 1);
     }
-
     addExpenseType(expenseType) {
         this.expenseTypes.push(expenseType);
     }
-
     updateExpenseType(index, expenseType) {
         this.expenseTypes[index] = expenseType;
     }
-
     deleteExpenseType(index) {
         this.expenseTypes.splice(index, 1);
     }
-
     addIncomeType(incomeType) {
         this.incomeTypes.push(incomeType);
     }
-
     updateIncomeType(index, incomeType) {
         this.incomeTypes[index] = incomeType;
     }
-
     deleteIncomeType(index) {
         this.incomeTypes.splice(index, 1);
     }
-
     addExpense(expense) {
         this.expenses.push(expense);
     }
-
     updateExpense(index, expense) {
         this.expenses[index] = expense;
     }
-
     deleteExpense(index) {
         if (index >= 0 && index < this.expenses.length) {
             this.expenses.splice(index, 1);
         }
     }
-
     addIncome(income) {
         this.incomes.push(income);
     }
-
     updateIncome(index, income) {
         this.incomes[index] = income;
     }
-
     deleteIncome(index) {
         if (index >= 0 && index < this.incomes.length) {
             this.incomes.splice(index, 1);
         }
     }
-
     calculateBalance(startDate, endDate) {
         let totalIncome = this.incomes
             .filter(income => income.date >= startDate && income.date <= endDate)
@@ -126,7 +105,6 @@ class Budget {
 
         return totalIncome - totalExpense;
     }
-
     filterTransactions(startDate, endDate) {
         let filteredIncomes = this.incomes.filter(income => income.date >= startDate && income.date <= endDate);
         let filteredExpenses = this.expenses.filter(expense => expense.date >= startDate && expense.date <= endDate);
@@ -137,36 +115,30 @@ class Budget {
         };
     }
 }
-
 let budget = new Budget();
 let purchaseCount = 1;
 let incomeCount = 1;
 let isEditing = false;
-
 budget.addIncome = function(income) {
     this.incomes.push(income);
     updateBalanceChart();
 };
-
 budget.deleteIncome = function(index) {
     if (index >= 0 && index < this.incomes.length) {
         this.incomes.splice(index, 1);
         updateBalanceChart();
     }
 };
-
 budget.addExpense = function(expense) {
     this.expenses.push(expense);
     updateBalanceChart();
 };
-
 budget.deleteExpense = function(index) {
     if (index >= 0 && index < this.expenses.length) {
         this.expenses.splice(index, 1);
         updateBalanceChart();
     }
 };
-
 function addExpenses() {
     purchaseCount++;
     const expensesList = document.getElementById('expenses-list');
@@ -192,7 +164,6 @@ function addExpenses() {
     `;
     expensesList.insertBefore(newPurchase, expensesList.lastElementChild);
 }
-
 function updateExpense(expenseId) {
     const dateElement = document.getElementById(`expense-date${expenseId}`);
     const amountElement = document.getElementById(`expense-amount${expenseId}`);
@@ -232,14 +203,12 @@ function updateExpense(expenseId) {
     }
     isEditing = !isEditing;
 }
-
 function deleteExpense(expenseId) {
     const expenseElement = document.getElementById(`expense${expenseId}`);
     if (!expenseElement) return;
     const index = Array.from(expenseElement.parentElement.parentElement.children)
         .filter(el => el.querySelector('[id^="expense"]'))
         .indexOf(expenseElement.parentElement);
-
     if (index !== -1) {
         budget.deleteExpense(index);
         expenseElement.parentElement.remove();
@@ -247,24 +216,19 @@ function deleteExpense(expenseId) {
         updateBalanceChart();
     }
 }
-
 function calculateTotalExpense() {
     if (budget.expenses.length === 0) {
         document.getElementById("expense-total").textContent = "0.00";
         return;
     }
-
     const totalValue = budget.expenses.reduce((accumulator, expense) => {
         const currency = budget.currencies.find(c => c.name === expense.currency.name);
         if (!currency) return accumulator;
-
         const valueInRubles = Number(expense.value) * currency.rate;
         return accumulator + valueInRubles;
     }, 0);
-    
     document.getElementById("expense-total").textContent = totalValue.toFixed(2);
 }
-
 function addIncome() {
     incomeCount++;
     const incomeList = document.getElementById('income-list');
@@ -290,7 +254,6 @@ function addIncome() {
     `;
     incomeList.insertBefore(newIncome, incomeList.lastElementChild);
 }
-
 function updateIncome(incomeId) {
     const dateElement = document.getElementById(`income-date${incomeId}`);
     const amountElement = document.getElementById(`income-amount${incomeId}`);
@@ -330,7 +293,6 @@ function updateIncome(incomeId) {
     }
     isEditing = !isEditing;
 }
-
 function deleteIncome(incomeId) {
     const incomeElement = document.getElementById(`income${incomeId}`);
     if (!incomeElement) return;
@@ -345,28 +307,23 @@ function deleteIncome(incomeId) {
         updateBalanceChart();
     }
 }
-
 function calculateTotalIncome() {
     if (budget.incomes.length === 0) {
         document.getElementById("income-total").textContent = "0.00";
         return;
     }
-
     const totalValue = budget.incomes.reduce((accumulator, income) => {
         const currency = budget.currencies.find(c => c.name === income.currency.name);
         if (!currency) return accumulator;
         const valueInRubles = Number(income.value) * currency.rate;
         return accumulator + valueInRubles;
     }, 0);
-    
     document.getElementById("income-total").textContent = totalValue.toFixed(2);
 }
-
 function applyExpenseFilters() {
     const startDate = document.getElementById('expense-start-date').value;
     const endDate = document.getElementById('expense-end-date').value;
     const typeFilter = document.getElementById('expense-type-filter').value.toLowerCase().trim();
-    
     let filteredExpenses = budget.expenses.filter(expense => {
         let matchesDate = true;
         let matchesType = true;
@@ -398,16 +355,13 @@ function applyExpenseFilters() {
     });
     updateExpensesList(filteredExpenses);
 }
-
 function applyIncomeFilters() {
     const startDate = document.getElementById('income-start-date').value;
     const endDate = document.getElementById('income-end-date').value;
     const typeFilter = document.getElementById('income-type-filter').value.toLowerCase().trim();
-    
     let filteredIncomes = budget.incomes.filter(income => {
         let matchesDate = true;
         let matchesType = true;
-
         if (startDate && endDate) {
             const incomeDate = new Date(income.date);
             const start = new Date(startDate);
@@ -429,7 +383,6 @@ function applyIncomeFilters() {
             end.setHours(0, 0, 0, 0);
             matchesDate = incomeDate <= end;
         }
-
         if (typeFilter) {
             matchesType = income.type.toLowerCase().includes(typeFilter);
         }
@@ -443,46 +396,36 @@ function applyBalanceFilters() {
     const endDate = document.getElementById('balance-end-date').value;
     const showIncome = document.getElementById('show-income').checked;
     const showExpenses = document.getElementById('show-expenses').checked;
-
     updateBalanceChart(startDate, endDate, showIncome, showExpenses);
 }
-
 function updateBalanceChart(startDate = '', endDate = '', showIncome = true, showExpenses = true) {
     const ctx = document.getElementById('balance-chart').getContext('2d');
     let dates = [...budget.incomes.map(i => i.date), ...budget.expenses.map(e => e.date)];
     dates = [...new Set(dates)].sort();
-
     if (startDate && endDate) {
         dates = dates.filter(date => date >= startDate && date <= endDate);
     }
-
     let balanceData = [];
     let runningBalance = 0;
-
     dates.forEach(date => {
         let dailyIncome = 0;
         let dailyExpense = 0;
-
         if (showIncome) {
             dailyIncome = budget.incomes
                 .filter(income => income.date === date)
                 .reduce((sum, income) => sum + (parseFloat(income.value) * income.currency.rate), 0);
         }
-
         if (showExpenses) {
             dailyExpense = budget.expenses
                 .filter(expense => expense.date === date)
                 .reduce((sum, expense) => sum + (parseFloat(expense.value) * expense.currency.rate), 0);
         }
-
         runningBalance += dailyIncome - dailyExpense;
         balanceData.push({ x: date, y: runningBalance });
     });
-
     if (window.balanceChart instanceof Chart) {
         window.balanceChart.destroy();
     }
-
     window.balanceChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -527,18 +470,13 @@ function updateBalanceChart(startDate = '', endDate = '', showIncome = true, sho
         }
     });
 }
-
 async function loadBudgetData() {
     try {
         const response = await fetch('http://localhost:3001/api/budget');
         const data = await response.json();
-        
-        // Load currencies
         data.currencies.forEach(currencyData => {
             budget.currencies.push(new Currency(currencyData.name, currencyData.rate, currencyData.date));
         });
-        
-        // Load expenses
         data.expenses.forEach(expenseData => {
             budget.expenses.push(new Expense(
                 expenseData.value,
@@ -547,8 +485,6 @@ async function loadBudgetData() {
                 expenseData.currency
             ));
         });
-        
-        // Load incomes
         data.incomes.forEach(incomeData => {
             budget.incomes.push(new Income(
                 incomeData.value,
@@ -557,22 +493,18 @@ async function loadBudgetData() {
                 incomeData.currency
             ));
         });
-        
-        // Update UI
         updateCurrencyList();
         updateExpensesList(budget.expenses);
         updateIncomesList(budget.incomes);
         updateBalanceChart();
     } catch (error) {
         console.error('Error loading budget data:', error);
-        // If loading fails, initialize with default currency
         if (budget.currencies.length === 0) {
             budget.addCurrency(new Currency('RUB', 1, new Date().toISOString().split('T')[0]));
             updateCurrencyList();
         }
     }
 }
-
 async function saveBudgetData() {
     try {
         await fetch('http://localhost:3001/api/budget', {
@@ -590,44 +522,37 @@ async function saveBudgetData() {
         console.error('Error saving budget data:', error);
     }
 }
-
 const originalAddExpense = budget.addExpense;
 budget.addExpense = function(expense) {
     originalAddExpense.call(this, expense);
     saveBudgetData();
 };
-
 const originalDeleteExpense = budget.deleteExpense;
 budget.deleteExpense = function(index) {
     originalDeleteExpense.call(this, index);
     saveBudgetData();
 };
-
 const originalAddIncome = budget.addIncome;
 budget.addIncome = function(income) {
     originalAddIncome.call(this, income);
     saveBudgetData();
 };
-
 const originalDeleteIncome = budget.deleteIncome;
 budget.deleteIncome = function(index) {
     originalDeleteIncome.call(this, index);
     saveBudgetData();
 };
-
 document.addEventListener('DOMContentLoaded', function() {
     loadBudgetData();
     if (budget.currencies.length === 0) {
         budget.addCurrency(new Currency('RUB', 1, new Date().toISOString().split('T')[0]));
     }
     updateCurrencyDropdowns();
-    
     const balanceTab = document.getElementById('balance-tab-content');
     const canvas = document.createElement('canvas');
     canvas.id = 'balance-chart';
     balanceTab.appendChild(canvas);
-    updateBalanceChart();
-    
+    updateBalanceChart();  
     const dropdowns = document.querySelectorAll('.dropdown-menu');
     dropdowns.forEach(dropdown => {
         dropdown.addEventListener('click', function(e) {
@@ -637,7 +562,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
 function updateExpensesList(filteredExpenses) {
     const expensesList = document.getElementById('expenses-list');
     const addButton = expensesList.lastElementChild;
@@ -668,7 +592,6 @@ function updateExpensesList(filteredExpenses) {
     expensesList.appendChild(addButton);
     updateFilteredTotal(filteredExpenses, 'expense');
 }
-
 function updateIncomesList(filteredIncomes) {
     const incomesList = document.getElementById('income-list');
 
@@ -700,47 +623,37 @@ function updateIncomesList(filteredIncomes) {
     incomesList.appendChild(addButton);
     updateFilteredTotal(filteredIncomes, 'income');
 }
-
 function updateFilteredTotal(filteredTransactions, type) {
     const totalValue = filteredTransactions.reduce((acc, t) => {
         const currency = budget.currencies.find(c => c.name === t.currency.name);
         if (!currency) return acc;
         return acc + (Number(t.value) * currency.rate);
     }, 0);
-
     const totalElement = document.getElementById(type === 'expense' ? 'expense-total' : 'income-total');
     totalElement.textContent = totalValue.toFixed(2);
 }
-
 function addCurrency() {
     const code = document.getElementById('currency-code').value.toUpperCase();
     const rate = parseFloat(document.getElementById('currency-rate').value);
     const date = document.getElementById('currency-date').value;
-
     if (!code || !rate || !date) {
         alert('Пожалуйста, заполните все поля');
         return;
     }
-
     const currency = new Currency(code, rate, date);
     budget.addCurrency(currency);
     updateCurrencyList();
     updateCurrencyDropdowns();
-    
-    // Очистка формы
     document.getElementById('currency-code').value = '';
     document.getElementById('currency-rate').value = '';
     document.getElementById('currency-date').value = '';
 }
-
 function updateCurrencyList() {
     const currencyList = document.getElementById('currency-list');
     currencyList.innerHTML = ''; 
-
     if (!budget.currencies.some(c => c.name === 'RUB')) {
         budget.addCurrency(new Currency('RUB', 1, new Date().toISOString().split('T')[0]));
     }
-
     budget.currencies.forEach((currency, index) => {
         const li = document.createElement('li');
         li.className = 'list-group-item d-flex justify-content-between align-items-center';
@@ -757,17 +670,14 @@ function updateCurrencyList() {
         currencyList.appendChild(li);
     });
 }
-
 function deleteCurrency(index) {
     budget.deleteCurrency(index);
     updateCurrencyList();
     updateCurrencyDropdowns();
 }
-
 function updateCurrencyDropdowns() {
     const expenseCurrencySelect = document.querySelector('#expense-currency1 select');
     const incomeCurrencySelect = document.querySelector('#income-currency1 select');
-    
     if (expenseCurrencySelect) {
         updateDropdown(expenseCurrencySelect);
     }
@@ -775,7 +685,6 @@ function updateCurrencyDropdowns() {
         updateDropdown(incomeCurrencySelect);
     }
 }
-
 function updateDropdown(select) {
     select.innerHTML = '';
     budget.currencies.forEach(currency => {

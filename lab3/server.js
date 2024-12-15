@@ -6,14 +6,12 @@ const path = require('path');
 const app = express();
 const PORT = 3001;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static('.'));
 
-// Path to the JSON file
 const dataPath = path.join(__dirname, 'budget.json');
 
-// Create budget.json if it doesn't exist
 if (!fs.existsSync(dataPath)) {
     const initialData = {
         currencies: [],
@@ -25,7 +23,6 @@ if (!fs.existsSync(dataPath)) {
     fs.writeFileSync(dataPath, JSON.stringify(initialData, null, 2));
 }
 
-// GET endpoint to retrieve budget data
 app.get('/api/budget', (req, res) => {
     try {
         const data = fs.readFileSync(dataPath, 'utf8');
@@ -36,7 +33,6 @@ app.get('/api/budget', (req, res) => {
     }
 });
 
-// POST endpoint to save budget data
 app.post('/api/budget', (req, res) => {
     try {
         fs.writeFileSync(dataPath, JSON.stringify(req.body, null, 2));
