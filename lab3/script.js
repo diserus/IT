@@ -528,7 +528,95 @@ function updateBalanceChart(startDate = '', endDate = '', showIncome = true, sho
     });
 }
 
+async function loadBudgetData() {
+    try {
+        const response = await fetch('http://localhost:3001/api/budget');
+        const data = await response.json();
+        
+        // Load currencies
+        data.currencies.forEach(currencyData => {
+            budget.currencies.push(new Currency(currencyData.name, currencyData.rate, currencyData.date));
+        });
+        
+        // Load expenses
+        data.expenses.forEach(expenseData => {
+            budget.expenses.push(new Expense(
+                expenseData.value,
+                expenseData.type,
+                expenseData.date,
+                expenseData.currency
+            ));
+        });
+        
+        // Load incomes
+        data.incomes.forEach(incomeData => {
+            budget.incomes.push(new Income(
+                incomeData.value,
+                incomeData.type,
+                incomeData.date,
+                incomeData.currency
+            ));
+        });
+        
+        // Update UI
+        updateCurrencyList();
+        updateExpensesList(budget.expenses);
+        updateIncomesList(budget.incomes);
+        updateBalanceChart();
+    } catch (error) {
+        console.error('Error loading budget data:', error);
+        // If loading fails, initialize with default currency
+        if (budget.currencies.length === 0) {
+            budget.addCurrency(new Currency('RUB', 1, new Date().toISOString().split('T')[0]));
+            updateCurrencyList();
+        }
+    }
+}
+
+async function saveBudgetData() {
+    try {
+        await fetch('http://localhost:3001/api/budget', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                currencies: budget.currencies,
+                expenses: budget.expenses,
+                incomes: budget.incomes
+            })
+        });
+    } catch (error) {
+        console.error('Error saving budget data:', error);
+    }
+}
+
+const originalAddExpense = budget.addExpense;
+budget.addExpense = function(expense) {
+    originalAddExpense.call(this, expense);
+    saveBudgetData();
+};
+
+const originalDeleteExpense = budget.deleteExpense;
+budget.deleteExpense = function(index) {
+    originalDeleteExpense.call(this, index);
+    saveBudgetData();
+};
+
+const originalAddIncome = budget.addIncome;
+budget.addIncome = function(income) {
+    originalAddIncome.call(this, income);
+    saveBudgetData();
+};
+
+const originalDeleteIncome = budget.deleteIncome;
+budget.deleteIncome = function(index) {
+    originalDeleteIncome.call(this, index);
+    saveBudgetData();
+};
+
 document.addEventListener('DOMContentLoaded', function() {
+    loadBudgetData();
     if (budget.currencies.length === 0) {
         budget.addCurrency(new Currency('RUB', 1, new Date().toISOString().split('T')[0]));
     }
